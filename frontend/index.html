@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Finance Tracker</title>
+  <link rel="stylesheet" href="style.css?v=5" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <div id="logo">
+      <div>
+        <h1>FinTrack</h1>
+        <p>Smart Finance Tracker</p>
+      </div>
+    </div>
+
+    <nav>
+      <button class="nav-btn active" onclick="showPage('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </button>
+      <button class="nav-btn" onclick="showPage('upload', this)">
+        <span class="nav-icon">📤</span> Upload Receipt
+      </button>
+      <button class="nav-btn" onclick="showPage('records', this)">
+        <span class="nav-icon">📋</span> All Records
+      </button>
+    </nav>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-header">
+        <div>
+          <h2>Dashboard</h2>
+          <p>Overview of your financial records</p>
+        </div>
+      </div>
+
+      <div id="summary-cards">
+        <div class="card card-1">
+          <div class="card-icon">📁</div>
+          <div>
+            <p class="card-label">Total Records</p>
+            <p class="card-value" id="total-records">0</p>
+          </div>
+        </div>
+        <div class="card card-2">
+          <div class="card-icon">💸</div>
+          <div>
+            <p class="card-label">Total Spending</p>
+            <p class="card-value" id="total-spending">$0</p>
+          </div>
+        </div>
+        <div class="card card-3">
+          <div class="card-icon">🏆</div>
+          <div>
+            <p class="card-label">Top Category</p>
+            <p class="card-value" id="top-category">-</p>
+          </div>
+        </div>
+        <!-- <div class="card card-4">
+          <div class="card-icon">✅</div>
+          <div>
+            <p class="card-label">Categorized items</p>
+            <p class="card-value" id="categorized-count">0</p>
+          </div>
+        </div> -->
+      </div>
+
+      <div class="grid-3">
+        <div class="section-box">
+          <h3>Spending by Category</h3>
+          <div id="category-breakdown">
+            <p class="empty-text">No categorized records yet</p>
+          </div>
+        </div>
+
+        <div class="section-box">
+          <h3>📈 Monthly Spending</h3>
+         <canvas id="monthlyChart" height="200"></canvas>
+        </div>
+        <div class="section-box">
+          <h3>Recent Activity</h3>
+          <div id="recent-activity">
+            <p class="empty-text">No recent records</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upload Page -->
+    <div id="page-upload" class="page">
+      <div class="page-header">
+        <div>
+          <h2>Upload Receipt</h2>
+          <p>Upload an image to extract and categorize spending</p>
+        </div>
+      </div>
+
+      <div class="upload-layout">
+        <div class="section-box">
+          <h3>📎 Select Image</h3>
+        <div id="upload-box" onclick="document.getElementById('imageUpload').click()">
+  <div id="upload-placeholder">
+    <div class="upload-icon">☁️</div>
+    <p class="upload-title">Click to upload</p>
+    <p class="upload-sub">JPG, PNG, WEBP supported</p>
+  </div>
+  <img id="image-preview" style="display:none" />
+  <input type="file" id="imageUpload" accept="image/*" style="display:none" />
+</div>
+          <div id="file-name-display" class="file-name-display" style="display:none">
+            <span id="file-name-text"></span>
+          </div>
+          <button id="analyseBtn" type="button">
+            🔍 Analyse Image
+          </button>
+        </div>
+
+        <div class="section-box" id="result-section" style="display:none">
+          <h3> Extracted Text</h3>
+          <div id="result-box">
+            <p id="result-text"></p>
+          </div>
+
+          <div id="categorized-box" style="display:none; margin-top: 20px;">
+            <h3>🤖 AI Categorization</h3>
+            <div class="cat-grid">
+              <div class="cat-item">
+                <span class="cat-label">Vendor</span>
+                <span class="cat-value" id="cat-vendor">-</span>
+              </div>
+              <div class="cat-item">
+                <span class="cat-label">Date</span>
+                <span class="cat-value" id="cat-date">-</span>
+              </div>
+              <div class="cat-item">
+                <span class="cat-label">Total</span>
+                <span class="cat-value" id="cat-total">-</span>
+              </div>
+              <div class="cat-item">
+                <span class="cat-label">Category</span>
+                <span class="cat-value" id="cat-category">-</span>
+              </div>
+            </div>
+            <div class="success-msg">✅ Record saved to database!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Records Page -->
+    <div id="page-records" class="page">
+      <div class="page-header">
+        <div>
+          <h2>All Records</h2>
+          <p>View and manage your spending records</p>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <div id="records-toolbar">
+          <input type="text" id="search-input" placeholder="Search by vendor..." />
+          <select id="filter-category">
+            <option value="">All Categories</option>
+            <option value="Food & Dining">Food & Dining</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Transport">Transport</option>
+            <option value="Bills & Utilities">Bills & Utilities</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Other">Other</option>
+          </select>
+          <button id="refreshBtn" type="button">🔄</button>
+          <button id="exportBtn" type="button">⬇️ Export CSV</button>
+        </div>
+
+        <table id="records-table">
+          <thead>
+              <tr>
+                 <th>Vendor</th>
+                 <th>Date</th>
+                 <th>Total</th>
+                  <th>Category</th>
+                 <th>Status</th>
+                 <th></th>
+               </tr>
+        </thead>
+          <tbody id="records-body">
+            <tr><td colspan="5" class="empty-text">No records yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div id="edit-modal">
+  <div id="edit-modal-content">
+    <h3>✏️ Edit Record</h3>
+    <input type="hidden" id="edit-id" />
+
+    <label>Vendor</label>
+    <input type="text" id="edit-vendor" />
+
+    <label>Date</label>
+    <input type="text" id="edit-date" />
+
+    <label>Total</label>
+    <input type="text" id="edit-total" />
+
+    <label>Category</label>
+    <select id="edit-category">
+      <option value="Food & Dining">Food & Dining</option>
+      <option value="Shopping">Shopping</option>
+      <option value="Transport">Transport</option>
+      <option value="Bills & Utilities">Bills & Utilities</option>
+      <option value="Healthcare">Healthcare</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <div id="edit-modal-actions">
+      <button onclick="closeEditModal()" class="cancel-btn">Cancel</button>
+      <button onclick="saveEdit()" class="save-btn">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+  <script src="app.js?v=5"></script>
+</body>
+</html>
